@@ -1,0 +1,24 @@
+#Dockerfile para C4 - S1
+FROM ubuntu:22.10
+
+#Reemplazar mirrors obsoletos y agregar sources para evitar errores
+RUN sed -i 's/archive.ubuntu.com/old-releases.ubuntu.com/g' /etc/apt/sources.list && \
+    echo "deb http://old-releases.ubuntu.com/ubuntu/ kinetic main restricted universe multiverse" > /etc/apt/sources.list && \
+    echo "deb http://old-releases.ubuntu.com/ubuntu/ kinetic-updates main restricted universe multiverse" >> /etc/apt/sources.list && \
+    echo "deb http://old-releases.ubuntu.com/ubuntu/ kinetic-security main restricted universe multiverse" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y openssh-client openssh-server && \
+    apt-get clean
+
+#Crear el usuario prueba y configurar SSH
+RUN useradd -m -s /bin/bash prueba && \
+    echo 'prueba:prueba' | chpasswd && \
+    mkdir -p /var/run/sshd
+
+#Exponer el puerto 22 para SSH
+EXPOSE 22
+
+#Iniciar el servidor SSH
+CMD ["/usr/sbin/sshd", "-D"]
+
+
